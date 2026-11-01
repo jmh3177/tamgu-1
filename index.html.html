@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>계열별 학생부 탐구활동 우수사례 아카이브</title>
+    <!-- Tailwind CSS (반응형 및 디자인을 위한 라이브러리) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <!-- PDF.js 및 SheetJS(엑셀) 라이브러리 로드 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; background-color: #f8fafc; }
+        /* 모바일 탭 메뉴 스크롤바 숨김 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* 카드 호버 애니메이션 */
+        .hover-card { transition: all 0.3s ease; }
+        .hover-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1); }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <!-- 헤더 영역 -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold text-indigo-700 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                    </svg>
+                    학생부 심화탐구 아이디어 뱅크
+                </h1>
+                <p class="text-sm text-gray-500 mt-1">선배들의 우수 탐구사례를 통해 나만의 학생부 활동을 기획해보세요.</p>
+            </div>
+            
+            <!-- 우측 컨트롤 영역 (검색 및 파일 첨부) -->
+            <div class="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto mt-2 md:mt-0">
+                <!-- 통합 검색창 -->
+                <div class="relative w-full sm:w-64">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <input type="text" id="searchInput" onkeyup="handleSearch(event)" placeholder="관심 키워드 검색" class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-colors">
+                </div>
+
+                <!-- 파일 첨부 영역 -->
+                <div class="w-full sm:w-auto">
+                    <button onclick="openImportModal()" class="w-full justify-center inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-lg text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                        </svg>
+                        데이터 첨부
+                    </button>
+                </div>
+                
+                <!-- 나의 탐구활동 확장 버튼 -->
+                <div class="w-full sm:w-auto">
+                    <button onclick="openAiModal()" class="w-full justify-center inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-bold rounded-lg text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 transition-colors whitespace-nowrap">
+                        <svg class="-ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                        나의 탐구활동 확장
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 카테고리 탭 메뉴 -->
+        <div class="border-t border-gray-100">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav class="flex space-x-4 overflow-x-auto py-3 no-scrollbar" id="categoryTabs">
+                    <!-- 탭 버튼들이 JS를 통해 이곳에 렌더링됩니다 -->
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 영역 (카드 그리드) -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div id="cardGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- 탐구 사례 카드들이 JS를 통해 이곳에 렌더링됩니다 -->
+        </div>
+        
+        <!-- 검색 결과가 없을 때 -->
+        <div id="emptyState" class="hidden text-center py-20">
+            <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <h3 class="mt-2 text-sm font-medium text-gray-900">해당 계열의 사례가 없습니다.</h3>
+        </div>
+    </main>
+
+    <!-- 상세 보기 모달 (팝업) -->
+    <div id="detailModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- 배경 어둡게 -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal()"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+            <!-- 모달 컨텐츠 -->
+            <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 max-h-[80vh] overflow-y-auto">
+                    <div class="flex justify-between items-start mb-4">
+                        <span id="modalCategory" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                            계열명
+                        </span>
+                        <button type="button" onclick="closeModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <h3 class="text-xl leading-6 font-bold text-gray-900 mb-2" id="modalTitle">탐구 주제 제목</h3>
+                    <p class="text-sm text-gray-500 mb-6 font-medium border-b pb-4" id="modalSubject">관련 과목 / 추천 학과</p>
+                    
+                    <div class="space-y-6">
+                        <div>
+                            <h4 class="text-base font-bold text-gray-900 flex items-center gap-2 mb-2">
+                                <span class="bg-blue-100 text-blue-800 p-1 rounded-md text-xs">01</span> 탐구 동기 및 배경
+                            </h4>
+                            <p class="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg leading-relaxed" id="modalBackground">내용</p>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-base font-bold text-gray-900 flex items-center gap-2 mb-2">
+                                <span class="bg-green-100 text-green-800 p-1 rounded-md text-xs">02</span> 심화 탐구 과정 및 주요 활동
+                            </h4>
+                            <p class="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg leading-relaxed whitespace-pre-line" id="modalDetails">내용</p>
+                        </div>
+
+                        <div>
+                            <h4 class="text-base font-bold text-gray-900 flex items-center gap-2 mb-2">
+                                <span class="bg-purple-100 text-purple-800 p-1 rounded-md text-xs">03</span> 느낀 점 및 세특 연계 포인트
+                            </h4>
+                            <p class="text-sm text-gray-600 bg-gray-50 p-4 rounded-lg leading-relaxed" id="modalInsights">내용</p>
+                        </div>
+
+                        <!-- 04 연계·심화 탐구활동 추천 영역 -->
+                        <div class="border-t border-gray-200 pt-5" id="modalRecommendationSection">
+                            <div class="flex items-center justify-between mb-3 flex-wrap gap-2">
+                                <h4 class="text-base font-bold text-gray-900 flex items-center gap-2">
+                                    <span class="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-1 rounded-md text-xs font-bold">04</span> 연계·심화 탐구활동 추천
+                                </h4>
+                                <button type="button" id="modalAiRecBtn" onclick="requestDetailAiRecommendation()" class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-lg text-white bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 shadow-sm transition-all hover:scale-[1.02] active:scale-[0.98]">
+                                    <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                    </svg>
+                                    <span>연계 탐구활동 추천받기</span>
+                                </button>
+                            </div>
+
+                            <!-- 추천 시작 전 안내 박스 -->
+                            <div id="modalAiPromptBox" class="bg-purple-50/60 border border-purple-100 rounded-xl p-4 text-center">
+                                <p class="text-xs text-purple-700 font-medium leading-relaxed">
+                                    💡 위의 <strong>[연계 탐구활동 추천받기]</strong> 버튼을 누르면 이 활동을 토대로 <strong>2022 개정 교육과정 연계 과목</strong>과 <strong>심화 탐구 주제 및 탐구 순서</strong>를 AI가 추천해 드립니다.
+                                </p>
+                            </div>
+
+                            <!-- AI 추천 생성 로딩 인디케이터 -->
+                            <div id="modalAiLoading" class="hidden py-6 text-center bg-purple-50/40 rounded-xl border border-purple-100">
+                                <svg class="animate-spin h-6 w-6 text-indigo-600 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                <p class="text-xs text-indigo-700 font-semibold animate-pulse">이 활동을 심화·확장할 수 있는 맞춤형 연계 탐구 주제를 기획하고 있습니다...</p>
+                            </div>
+
+                            <!-- AI 추천 결과 출력 박스 -->
+                            <div id="modalAiResult" class="hidden mt-3 bg-purple-50/80 border border-purple-200 rounded-xl p-4">
+                                <div id="modalAiResultContent" class="text-sm text-gray-800 leading-relaxed"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-col sm:flex-row-reverse gap-2 sm:gap-0">
+                    <button type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm" onclick="closeModal()">
+                        이전 페이지 가기
+                    </button>
+                    <button type="button" id="btnGoToCategory" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                        계열별 처음으로 돌아가기
+                    </button>
+                    <button type="button" onclick="triggerRecommendationAndScroll()" class="w-full inline-flex justify-center rounded-md border border-purple-300 shadow-sm px-4 py-2 bg-purple-50 text-base font-semibold text-purple-700 hover:bg-purple-100 focus:outline-none sm:w-auto sm:text-sm">
+                        ✨ 연계 탐구 추천받기
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CRUD 입력/수정 폼 모달 -->
+    <div id="formModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeFormModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+                <form id="crudForm" onsubmit="handleFormSubmit(event)">
+                    <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 max-h-[80vh] overflow-y-auto">
+                        <h3 class="text-xl leading-6 font-bold text-gray-900 mb-4" id="formModalTitle">새 탐구사례 추가</h3>
+                        <input type="hidden" id="formId">
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">계열</label>
+                                <select id="formCategory" required class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md border bg-white">
+                                    <option value="인문·어문">인문·어문</option>
+                                    <option value="사회과학·경영">사회과학·경영</option>
+                                    <option value="자연과학">자연과학</option>
+                                    <option value="공학">공학</option>
+                                    <option value="의약·바이오">의약·바이오</option>
+                                    <option value="교육">교육</option>
+                                    <option value="예체능">예체능</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">관련 과목 / 추천 학과</label>
+                                <input type="text" id="formSubject" required placeholder="예: 생명과학 / 약학과" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">탐구 주제 및 제목</label>
+                                <input type="text" id="formTitle" required class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">탐구 동기 및 배경</label>
+                                <textarea id="formBackground" required rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">심화 탐구 과정 및 주요 활동</label>
+                                <textarea id="formDetails" required rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">느낀 점 및 세특 연계 포인트</label>
+                                <textarea id="formInsights" required rows="2" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">핵심 태그 (쉼표로 구분)</label>
+                                <input type="text" id="formTags" placeholder="예: #인공지능, #윤리, #빅데이터" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">
+                            저장
+                        </button>
+                        <button type="button" onclick="closeFormModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                            취소
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 플로팅 추가 버튼 -->
+    <button onclick="openFormModal()" class="fixed bottom-6 right-6 bg-indigo-600 text-white rounded-full p-4 shadow-lg hover:bg-indigo-700 focus:outline-none hover:-translate-y-1 transition-transform z-40">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+        </svg>
+    </button>
+
+    <!-- AI 심화주제 추천 모달 -->
+    <div id="aiModal" class="fixed inset-0 z-50 hidden" aria-labelledby="ai-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeAiModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 max-h-[85vh] overflow-y-auto">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-2xl leading-6 font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-indigo-600 flex items-center gap-2" id="ai-modal-title">
+                            <svg class="h-7 w-7 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                            </svg>
+                            나의 탐구활동 확장
+                        </h3>
+                        <button type="button" onclick="closeAiModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none bg-gray-100 rounded-full p-1">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                    
+                    <form onsubmit="getAiRecommendation(event)" class="mt-4">
+                        <label for="aiInput" class="block text-sm font-semibold text-gray-700 mb-2">이미 수행했거나 관심 있는 탐구활동 내용을 자유롭게 적어주세요.</label>
+                        <textarea id="aiInput" required rows="3" placeholder="예: 미세플라스틱이 강낭콩 생장에 미치는 영향을 실험함. 환경오염 문제에 관심이 많음." class="focus:ring-purple-500 focus:border-purple-500 block w-full shadow-sm sm:text-base border-gray-300 rounded-lg border p-3 bg-gray-50"></textarea>
+                        
+                        <!-- 참고 문서(PDF/Excel) 첨부 영역 -->
+                        <div class="mt-3 p-3 bg-gray-50 border border-gray-200 rounded-lg">
+                            <div class="flex items-center justify-between mb-1">
+                                <label class="block text-xs font-bold text-gray-700">참고 파일 첨부 (선택 사항)</label>
+                                <span class="text-[11px] text-indigo-600 font-medium">PDF, 엑셀(.xlsx, .csv) 지원</span>
+                            </div>
+                            <div class="flex items-center gap-2 mt-1">
+                                <input type="file" id="aiFileInput" accept=".pdf, .xlsx, .xls, .csv" class="hidden" onchange="handleAiFileChange(event)">
+                                <button type="button" onclick="document.getElementById('aiFileInput').click()" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-xs font-semibold rounded-md text-gray-700 bg-white hover:bg-gray-50 transition-colors">
+                                    <svg class="h-4 w-4 mr-1 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                    </svg>
+                                    파일 선택
+                                </button>
+                                <span id="aiFileName" class="text-xs text-gray-500 truncate max-w-[200px] sm:max-w-xs">선택된 파일 없음</span>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="aiSubmitBtn" class="mt-3 w-full inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-4 py-3 bg-indigo-600 text-base font-bold text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                            <span>연계 탐구활동 추천받기</span>
+                        </button>
+                    </form>
+
+                    <!-- 로딩 인디케이터 -->
+                    <div id="aiLoading" class="hidden mt-8 text-center py-10">
+                        <svg class="animate-spin -ml-1 mr-3 h-10 w-10 text-indigo-600 mx-auto mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p class="text-sm text-gray-500 font-medium animate-pulse">AI 교사가 학생부 맞춤형 심화 주제를 기획하고 있습니다...<br>(약 5~10초 소요)</p>
+                    </div>
+
+                    <!-- 결과 표시 영역 -->
+                    <div id="aiResultContainer" class="hidden mt-6 bg-purple-50 border border-purple-100 rounded-xl p-5 shadow-inner">
+                        <div id="aiResultContent" class="text-base text-gray-800 leading-relaxed">
+                            <!-- AI 응답이 이곳에 출력됩니다 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 데이터 첨부 메뉴 모달 -->
+    <div id="importModal" class="fixed inset-0 z-50 hidden" aria-labelledby="import-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeImportModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-xl text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl leading-6 font-bold text-gray-900" id="import-modal-title">데이터 첨부하기</h3>
+                        <button type="button" onclick="closeImportModal()" class="text-gray-400 hover:text-gray-500 focus:outline-none">
+                            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                        </button>
+                    </div>
+                    
+                    <div class="space-y-6 mt-4">
+                        <!-- 1. 다중 형식 파일 업로드 (JSON, 엑셀, PDF, 이미지) -->
+                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="text-sm font-bold text-gray-900">1. 내 PC 파일 첨부</h4>
+                                <span class="text-xs text-indigo-600 font-semibold bg-indigo-50 px-2 py-0.5 rounded">다중 파일 & 포맷 지원</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-3">여러 개 파일을 한 번에 선택(Ctrl/Shift 클릭)하여 첨부할 수 있습니다.</p>
+                            
+                            <!-- multiple 속성 -->
+                            <input type="file" id="unifiedFileInput" accept=".json, .xlsx, .xls, .csv, .pdf, image/*" multiple class="hidden" onchange="importFromFile(event)">
+                            <button id="importFileBtn" onclick="document.getElementById('unifiedFileInput').click()" class="w-full justify-center inline-flex items-center px-4 py-2.5 border border-indigo-200 shadow-sm text-sm font-semibold rounded-lg text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                <svg class="-ml-1 mr-2 h-5 w-5 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                                </svg>
+                                파일 선택 (여러 개 선택 가능: JSON / 엑셀 / PDF / 이미지)
+                            </button>
+                            <p class="text-[11px] text-gray-400 mt-2 leading-relaxed">
+                                * PDF와 이미지, 활동지는 AI가 내용을 분석하여 자동으로 사례 카드를 생성합니다 (개인정보는 자동 제외).
+                            </p>
+                        </div>
+
+                        <!-- 로딩 표시창 (분석 중일 때 노출) -->
+                        <div id="importLoadingIndicator" class="hidden bg-indigo-50 border border-indigo-100 p-4 rounded-lg text-center">
+                            <svg class="animate-spin h-6 w-6 text-indigo-600 mx-auto mb-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <p id="importLoadingText" class="text-xs text-indigo-700 font-bold">파일을 분석하고 있습니다...</p>
+                        </div>
+                        
+                        <!-- 2. 첨부 및 업데이트된 데이터 백업 (data.json 다운로드) -->
+                        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+                            <div class="flex justify-between items-center mb-1">
+                                <h4 class="text-sm font-bold text-gray-900">2. 첨부 및 업데이트된 데이터 백업</h4>
+                                <span class="text-xs text-green-700 font-semibold bg-green-50 px-2 py-0.5 rounded">깃허브 간편 배포용</span>
+                            </div>
+                            <p class="text-xs text-gray-500 mb-3">누적된 모든 탐구 데이터를 <strong>data.json</strong> 파일로 다운로드합니다. 이 파일을 깃허브에 드래그하면 모든 학생에게 즉시 배포됩니다.</p>
+                            <button onclick="exportDataBackup()" class="w-full justify-center inline-flex items-center px-4 py-2.5 border border-green-300 shadow-sm text-sm font-semibold rounded-lg text-green-700 bg-white hover:bg-green-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors">
+                                <svg class="-ml-1 mr-2 h-5 w-5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                전체 데이터 백업 다운로드 (data.json)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 토스트 메시지 알림창 -->
+    <div id="toastMessage" class="fixed top-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-xl z-[100] text-white font-bold transition-all duration-300 hidden opacity-0 translate-y-[-20px]"></div>
+
+    <!-- 자체 디자인 컨펌(확인) 모달 -->
+    <div id="confirmModal" class="fixed inset-0 z-[60] hidden" aria-labelledby="confirm-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeConfirmModal()"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <svg class="h-6 w-6 text-red-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                            </svg>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="confirm-modal-title">삭제 확인</h3>
+                            <div class="mt-2">
+                                <p class="text-sm text-gray-500" id="confirm-modal-message">정말로 이 탐구사례를 삭제하시겠습니까?</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" id="confirmOkBtn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm">삭제</button>
+                    <button type="button" onclick="closeConfirmModal()" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript 로직 -->
+    <script>
+        const categories = [
+            "전체보기", "인문·어문", "사회과학·경영", "자연과학", "공학", "의약·바이오", "교육", "예체능"
+        ];
+
+        // 기본 제공 샘플 데이터
+        const defaultData = [
+            {
+                id: 1,
+                category: "인문·어문",
+                subject: "문학 / 국어 / 영어영문학과",
+                title: "번역기(파파고)와 직접 번역한 영어 문장 비교 탐구",
+                background: "영어 숙제를 하면서 번역기를 자주 쓰는데, 기계가 우리말의 미묘한 느낌이나 속담을 잘 살리는지 궁금해졌다.",
+                details: "[탐구 순서]\n1. 교과서에 나오는 영어 속담과 관용구 5가지를 선정한다.\n2. 기계 번역기에 넣어 결과를 확인한다.\n3. 영어 선생님이나 사전을 참고해 내가 직접 번역해본다.\n4. 두 번역의 차이점과 기계 번역의 어색한 부분을 비교해 표로 정리한다.",
+                insights: "번역기는 빠르지만 문화적인 뜻(속담 등)은 어색하게 번역한다는 것을 알았다. 영어 단어의 진짜 뜻과 문맥을 아는 것이 중요하다고 느꼈다.",
+                tags: ["#기계번역", "#영어공부", "#비교문학"]
+            },
+            {
+                id: 2,
+                category: "사회과학·경영",
+                subject: "경제 / 정치와 법 / 경영학과",
+                title: "우리 학교 매점 인기 상품 분석과 진열 위치의 비밀",
+                background: "학교 매점에 가면 항상 앞쪽에 있는 과자만 사게 되는데, 물건을 놓는 위치가 학생들의 구매에 어떤 영향을 주는지 알아보고 싶었다.",
+                details: "[탐구 순서]\n1. 일주일 동안 매점에서 가장 많이 팔린 간식 3가지를 조사한다.\n2. 그 간식들이 매점의 어느 위치에 있는지 구조도를 그린다.\n3. 친구들 20명에게 '왜 그 과자를 샀는지' 설문조사한다.\n4. 눈에 잘 띄는 곳(골든존)에 있는 상품이 더 잘 팔린다는 마케팅 원리를 알아본다.",
+                insights: "물건의 진열 위치만으로도 사람들의 선택을 바꿀 수 있다는 마케팅의 기본 원리를 쉽게 이해하게 되었다.",
+                tags: ["#마케팅", "#골든존", "#설문조사"]
+            },
+            {
+                id: 3,
+                category: "공학",
+                subject: "물리학 / 정보 / 컴퓨터공학과",
+                title: "스마트폰 앱을 활용한 우리 동네 소음 지도 만들기",
+                background: "우리 동네 공사장 주변이 너무 시끄러워서, 실제로 소음이 얼마나 심한지 측정해보고 싶었다.",
+                details: "[탐구 순서]\n1. 스마트폰에서 무료 '소음 측정기' 앱을 다운받는다.\n2. 학교 앞, 공사장 근처, 놀이터 등 3곳을 측정 장소로 정한다.\n3. 같은 시간대에 각 장소에서 1분씩 소음(dB)을 측정한다.\n4. 측정한 숫자를 인터넷 지도의 해당 위치에 적어 '소음 지도'를 완성한다.",
+                insights: "소음이 몇 데시벨(dB) 이상일 때 스트레스를 주는지 알게 되었고, 우리 주변의 환경 문제를 스마트폰으로 쉽게 측정하는 방법을 배웠다.",
+                tags: ["#스마트폰", "#소음공해", "#환경지도"]
+            },
+            {
+                id: 4,
+                category: "자연과학",
+                subject: "생명과학 / 화학 / 환경과학과",
+                title: "여러 가지 음료수가 식물(양파) 자람에 미치는 영향",
+                background: "사람들이 자주 마시는 콜라나 이온음료를 식물에게 주면 식물이 더 잘 자랄지, 아니면 시들지 궁금했다.",
+                details: "[탐구 순서]\n1. 크기가 비슷한 양파 3개를 준비하여 투명한 컵에 올린다.\n2. 각각 물, 콜라, 이온음료를 뿌리만 닿게 붓는다.\n3. 1주일 동안 매일 같은 시간에 뿌리가 자란 길이를 자로 잰다.\n4. 물과 다른 음료수에서 자란 양파 뿌리의 차이를 사진으로 찍고 비교한다.",
+                insights: "식물도 사람처럼 순수한 물을 먹을 때 가장 건강하게 자란다는 것을 눈으로 확인했고, 첨가물이 식물 생장에 주는 영향을 알게 되었다.",
+                tags: ["#식물생장", "#비교실험", "#첨가물"]
+            },
+            {
+                id: 5,
+                category: "의약·바이오",
+                subject: "생명과학 / 보건 / 의예과·약학과",
+                title: "올바른 손 씻기 방법과 비누의 세균 제거 효과 탐구",
+                background: "감기 예방을 위해 손을 씻으라고 하는데, 물로만 씻을 때와 비누로 씻을 때 얼마나 차이가 나는지 직접 확인해보고 싶었다.",
+                details: "[탐구 순서]\n1. 식빵 3조각을 준비해 투명한 지퍼백에 넣는다.\n2. 씻지 않은 손, 물로만 씻은 손, 비누로 씻은 손으로 각각 식빵을 여러 번 문지른다.\n3. 따뜻한 곳에 일주일간 두고 곰팡이가 생기는 정도를 관찰한다.\n4. 곰팡이가 핀 면적을 비교해 비누의 세균 제거 효과를 결론 내린다.",
+                insights: "말로만 듣던 손 씻기의 중요성을 곰팡이 실험으로 직접 보니 비누 사용이 얼마나 중요한지 깨달았고, 개인위생에 더 신경 쓰게 되었다.",
+                tags: ["#개인위생", "#곰팡이실험", "#손씻기"]
+            },
+            {
+                id: 6,
+                category: "교육",
+                subject: "한국사 / 사회문화 / 교육학과",
+                title: "친구들이 좋아하는 역사 수업 방식 설문조사",
+                background: "역사 시간이 지루하다는 친구들이 많아서, 어떻게 하면 역사를 재미있게 배울 수 있을지 알아보고 싶었다.",
+                details: "[탐구 순서]\n1. 퀴즈, 역할극, 영상 시청, 만화 그리기 등 4가지 수업 방식 보기를 만든다.\n2. 우리 반 친구 20명에게 가장 좋아하는 방식을 스티커로 투표하게 한다.\n3. 결과를 그래프(엑셀 또는 손그림)로 그린다.\n4. 투표 1위 방식을 적용한 5분짜리 짧은 역사 수업 아이디어를 제안한다.",
+                insights: "학생마다 좋아하는 학습 방법이 다르다는 것을 알았고, 영상이나 퀴즈 같은 활동이 학습 흥미를 높인다는 점을 확인했다.",
+                tags: ["#학습흥미", "#설문조사", "#수업방식"]
+            },
+            {
+                id: 7,
+                category: "예체능",
+                subject: "체육 / 물리 / 체육교육과",
+                title: "운동화 밑창 모양에 따른 미끄러짐 방지 효과 비교",
+                background: "체육 시간에 농구를 하다 자주 미끄러져서, 어떤 운동화가 가장 덜 미끄러지는지 바닥 마찰력을 비교해보고 싶었다.",
+                details: "[탐구 순서]\n1. 바닥 무늬가 다른 3종류의 신발(농구화, 런닝화, 단화)을 준비한다.\n2. 경사진 판 위에 신발을 올려두고 판의 각도를 서서히 높인다.\n3. 각 신발이 미끄러지기 시작할 때의 각도를 스마트폰 각도기 앱으로 잰다.\n4. 밑창의 무늬(지그재그, 일자 등)와 미끄러진 각도의 관계를 정리한다.",
+                insights: "체육 장비가 단순한 멋이 아니라 과학(마찰력)이 숨어있다는 것을 깨닫고, 스포츠 과학에 흥미가 생겼다.",
+                tags: ["#마찰력", "#스포츠과학", "#운동화"]
+            }
+        ];
+
+        // 1차: 로컬스토리지 데이터 로드
+        let storedData = localStorage.getItem('archiveData_v2') || localStorage.getItem('archiveData');
+        let data = storedData ? JSON.parse(storedData) : defaultData;
+
+        let currentCategory = "전체보기";
+        let currentKeyword = "";
+        let currentModalItem = null;
+
+        function saveData() {
+            localStorage.setItem('archiveData_v2', JSON.stringify(data));
+        }
+
+        // 깃허브 등에 배포된 data.json 파일을 비동기로 자동 감지하여 불러오는 함수
+        async function fetchRemoteDataJson() {
+            try {
+                // 브라우저 캐시 방지를 위해 시간 쿼리 스트링(?t=...) 추가
+                const response = await fetch('./data.json?t=' + Date.now(), { cache: 'no-store' });
+                if (response.ok) {
+                    const remoteJson = await response.json();
+                    if (Array.isArray(remoteJson) && remoteJson.length > 0) {
+                        data = remoteJson;
+                        saveData();
+                        renderTabs();
+                        renderCards();
+                        console.log('✅ 깃허브 data.json 동기화 완료: 총 ' + data.length + '건');
+                    }
+                }
+            } catch (err) {
+                // 로컬 환경(file://)이거나 깃허브에 아직 data.json이 없는 경우 기존 data를 그대로 사용
+                console.log('💡 원격 data.json 없음 또는 로컬 실행 중 - 내장 데이터 사용');
+            }
+        }
+
+        // 초기화 함수
+        async function init() {
+            renderTabs();
+            renderCards();
+            // 페이지가 열릴 때 깃허브의 data.json이 있다면 즉시 최신 데이터로 동기화
+            await fetchRemoteDataJson();
+        }
+
+        // 탭 메뉴 렌더링
+        function renderTabs() {
+            const tabsContainer = document.getElementById('categoryTabs');
+            tabsContainer.innerHTML = '';
+            
+            categories.forEach(cat => {
+                const btn = document.createElement('button');
+                const isSelected = currentCategory === cat;
+                
+                const count = cat === "전체보기" 
+                    ? data.length 
+                    : data.filter(item => item.category === cat).length;
+                
+                btn.className = `whitespace-nowrap inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors duration-200 
+                    ${isSelected 
+                        ? 'bg-indigo-600 text-white shadow-sm' 
+                        : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'}`;
+                
+                const badgeClass = isSelected 
+                    ? 'bg-white/20 text-white' 
+                    : 'bg-gray-100 text-gray-600';
+
+                btn.innerHTML = `
+                    <span>${cat}</span>
+                    <span class="text-xs px-2 py-0.5 rounded-full font-semibold ${badgeClass}">${count}</span>
+                `;
+
+                btn.onclick = () => {
+                    currentCategory = cat;
+                    currentKeyword = "";
+                    const searchInput = document.getElementById('searchInput');
+                    if (searchInput) searchInput.value = "";
+                    
+                    renderTabs();
+                    renderCards();
+                };
+                tabsContainer.appendChild(btn);
+            });
+        }
+
+        // 카드 렌더링
+        function renderCards() {
+            const grid = document.getElementById('cardGrid');
+            const emptyState = document.getElementById('emptyState');
+            grid.innerHTML = '';
+
+            let filteredData = currentCategory === "전체보기" 
+                ? data 
+                : data.filter(item => item.category === currentCategory);
+
+            if (currentKeyword !== "") {
+                filteredData = filteredData.filter(item => {
+                    const searchStr = `${item.title} ${item.subject} ${item.background} ${item.details} ${item.insights} ${(item.tags||[]).join(' ')}`.toLowerCase();
+                    return searchStr.includes(currentKeyword);
+                });
+            }
+
+            if (filteredData.length === 0) {
+                grid.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+                emptyState.querySelector('h3').innerText = currentKeyword ? `'${currentKeyword}'에 대한 검색 결과가 없습니다.` : "해당 계열의 사례가 없습니다.";
+                return;
+            }
+
+            grid.classList.remove('hidden');
+            emptyState.classList.add('hidden');
+
+            filteredData.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col h-full hover-card cursor-pointer relative overflow-hidden";
+                card.onclick = () => openModal(item);
+                
+                const colorMap = {
+                    "인문·어문": "bg-pink-500", "사회과학·경영": "bg-blue-500", 
+                    "자연과학": "bg-green-500", "공학": "bg-gray-700", 
+                    "의약·바이오": "bg-teal-500", "교육": "bg-yellow-500", "예체능": "bg-purple-500"
+                };
+                const barColor = colorMap[item.category] || "bg-indigo-500";
+                const safeTags = Array.isArray(item.tags) ? item.tags : [];
+
+                card.innerHTML = `
+                    <div class="absolute top-0 left-0 w-full h-1 ${barColor}"></div>
+                    <div class="flex justify-between items-start mb-4 mt-2">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-gray-100 text-gray-800">
+                            ${item.category}
+                        </span>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">${item.title}</h3>
+                    <p class="text-xs text-indigo-600 font-medium mb-4">${item.subject}</p>
+                    <p class="text-sm text-gray-600 mb-4 line-clamp-3 flex-grow">${item.background}</p>
+                    <div class="flex flex-wrap gap-1 mb-4">
+                        ${safeTags.map(tag => `<span class="text-xs text-gray-500 bg-gray-50 px-2 py-1 rounded border">${tag}</span>`).join('')}
+                    </div>
+                    
+                    <div class="flex justify-end gap-2 mt-auto pt-4 border-t border-gray-100 w-full relative z-10">
+                        <button onclick="editItem(${item.id}, event)" class="text-xs px-3 py-1.5 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 rounded-md transition-colors font-medium">수정</button>
+                        <button onclick="deleteItem(${item.id}, event)" class="text-xs px-3 py-1.5 bg-white border border-red-200 hover:bg-red-50 text-red-600 rounded-md transition-colors font-medium">삭제</button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // 모달 열기 (상세보기)
+        function openModal(item) {
+            currentModalItem = item;
+
+            document.getElementById('modalCategory').innerText = item.category;
+            document.getElementById('modalTitle').innerText = item.title;
+            document.getElementById('modalSubject').innerText = item.subject;
+            document.getElementById('modalBackground').innerText = item.background;
+            document.getElementById('modalDetails').innerText = item.details;
+            document.getElementById('modalInsights').innerText = item.insights;
+
+            const promptBox = document.getElementById('modalAiPromptBox');
+            if (promptBox) promptBox.classList.remove('hidden');
+            const loading = document.getElementById('modalAiLoading');
+            if (loading) loading.classList.add('hidden');
+            const resultBox = document.getElementById('modalAiResult');
+            if (resultBox) resultBox.classList.add('hidden');
+            const resultContent = document.getElementById('modalAiResultContent');
+            if (resultContent) resultContent.innerHTML = '';
+            const recBtn = document.getElementById('modalAiRecBtn');
+            if (recBtn) {
+                recBtn.disabled = false;
+                recBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            const btnGoToCategory = document.getElementById('btnGoToCategory');
+            btnGoToCategory.onclick = () => {
+                currentCategory = item.category;
+                renderTabs();
+                renderCards();
+                closeModal();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            };
+
+            const modal = document.getElementById('detailModal');
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function triggerRecommendationAndScroll() {
+            const sec = document.getElementById('modalRecommendationSection');
+            if (sec) {
+                sec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+            requestDetailAiRecommendation();
+        }
+
+        async function requestDetailAiRecommendation() {
+            if (!currentModalItem) return;
+
+            const promptBox = document.getElementById('modalAiPromptBox');
+            const loading = document.getElementById('modalAiLoading');
+            const resultBox = document.getElementById('modalAiResult');
+            const resultContent = document.getElementById('modalAiResultContent');
+            const btn = document.getElementById('modalAiRecBtn');
+
+            if (promptBox) promptBox.classList.add('hidden');
+            if (resultBox) resultBox.classList.add('hidden');
+            if (loading) loading.classList.remove('hidden');
+            if (btn) {
+                btn.disabled = true;
+                btn.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+
+            const query = `[기존 탐구활동 정보]
+- 계열: ${currentModalItem.category}
+- 과목/학과: ${currentModalItem.subject}
+- 탐구 주제: ${currentModalItem.title}
+- 탐구 동기: ${currentModalItem.background}
+- 심화 탐구 내용: ${currentModalItem.details}
+- 세특 포인트 및 느낀 점: ${currentModalItem.insights}
+- 태그: ${(currentModalItem.tags || []).join(', ')}
+
+위 기존 탐구활동을 직접 수행한 고등학생이 2022 개정 교육과정의 다양한 일반선택/진로선택/융합선택 과목과 연계하여 다음 단계로 확장, 심화, 융합할 수 있는 맞춤형 연계 탐구활동 2~3가지를 구체적인 탐구 순서와 함께 추천해주세요.`;
+
+            const systemPrompt = `당신은 대한민국 최고의 고등학교 진로/진학 전문 교사입니다. 
+학생의 기존 탐구활동을 면밀히 분석하여 '2022 개정 교육과정' 과목과 연계된 심화·확장 탐구 주제 2~3가지를 추천해주세요.
+각 추천에는 다음 내용이 반드시 포함되어야 합니다:
+1. 연계 과목명 (2022 개정 교육과정 기준, 예: 통합과학, 화법과 언어, 생명과학, 인공지능 기초 등)
+2. 호기심을 유발하는 구체적이고 실현 가능한 심화 탐구 주제
+3. 해당 주제를 탐구하기 위한 간단한 탐구 방법 및 순서 (3~4단계)
+
+답변은 마크다운 기호(\`\`\`html 등)를 절대 포함하지 말고, 순수 HTML 구조만 출력하세요.
+Tailwind CSS 클래스를 반드시 적용하여 예쁘게 정돈해주세요:
+- 추천 목록 컨테이너: <ul class="list-none space-y-4 mb-2">
+- 각 주제 아이템: <li class="bg-white p-4 rounded-xl shadow-sm border border-purple-100">
+- 과목명 (버튼 형태, 온클릭 이벤트 필수): <button type="button" onclick="searchFromAi(this.innerText)" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 hover:bg-indigo-200 transition-colors mb-2 cursor-pointer">과목명</button>
+- 개별 주제 제목: <strong class="block text-base font-bold text-gray-900 mb-2 border-b pb-2">주제명</strong>
+- 탐구 순서 컨테이너: <div class="bg-gray-50 p-3 rounded-lg mt-2">
+- 탐구 순서 제목: <span class="font-bold text-xs text-indigo-700 block mb-1.5">💡 탐구 방법 및 순서</span>
+- 탐구 순서 리스트(ol): <ol class="list-decimal list-inside text-xs text-gray-700 space-y-1">
+- 탐구 순서 항목(li): <li>내용</li>`;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: query }] }],
+                        systemInstruction: { parts: [{ text: systemPrompt }] }
+                    })
+                });
+
+                if (!response.ok) throw new Error("AI 추천 서버 응답 오류");
+                const resData = await response.json();
+                const textResponse = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+
+                if (textResponse) {
+                    let cleanHtml = textResponse.replace(/```html\n?/g, '').replace(/```\n?/g, '');
+                    resultContent.innerHTML = cleanHtml;
+                    resultBox.classList.remove('hidden');
+                } else {
+                    resultContent.innerHTML = '<p class="text-xs text-red-500 font-bold p-3 bg-red-50 rounded-lg">연계 탐구 추천 결과를 불러오지 못했습니다. 다시 시도해주세요.</p>';
+                    resultBox.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("상세보기 연계 추천 오류:", error);
+                resultContent.innerHTML = '<p class="text-xs text-red-500 font-bold p-3 bg-red-50 rounded-lg">네트워크 오류 또는 트래픽 제한이 발생했습니다. 잠시 후 다시 시도해주세요.</p>';
+                resultBox.classList.remove('hidden');
+            } finally {
+                if (loading) loading.classList.add('hidden');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+            }
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('detailModal');
+            modal.classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeModal();
+                closeFormModal();
+            }
+        });
+
+        function handleSearch(event) {
+            currentKeyword = event.target.value.trim().toLowerCase();
+            if (currentKeyword !== "") {
+                if (currentCategory !== "전체보기") {
+                    currentCategory = "전체보기";
+                    renderTabs(); 
+                }
+            }
+            renderCards();
+        }
+
+        // ==========================================
+        // CRUD 기능
+        // ==========================================
+
+        function openFormModal(item = null) {
+            const modal = document.getElementById('formModal');
+            const title = document.getElementById('formModalTitle');
+            const form = document.getElementById('crudForm');
+            
+            form.reset();
+            
+            if (item) {
+                title.innerText = "탐구사례 수정";
+                document.getElementById('formId').value = item.id;
+                document.getElementById('formCategory').value = item.category;
+                document.getElementById('formSubject').value = item.subject;
+                document.getElementById('formTitle').value = item.title;
+                document.getElementById('formBackground').value = item.background;
+                document.getElementById('formDetails').value = item.details;
+                document.getElementById('formInsights').value = item.insights;
+                document.getElementById('formTags').value = item.tags.join(', ');
+            } else {
+                title.innerText = "새 탐구사례 추가";
+                document.getElementById('formId').value = "";
+                if(currentCategory !== "전체보기") {
+                    document.getElementById('formCategory').value = currentCategory;
+                }
+            }
+            
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFormModal() {
+            document.getElementById('formModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function handleFormSubmit(event) {
+            event.preventDefault();
+            
+            const id = document.getElementById('formId').value;
+            const tagsInput = document.getElementById('formTags').value;
+            const tags = tagsInput.split(',')
+                .map(tag => tag.trim())
+                .filter(tag => tag !== "")
+                .map(tag => tag.startsWith('#') ? tag : '#' + tag);
+            
+            const newItem = {
+                id: id ? parseInt(id) : Date.now(),
+                category: document.getElementById('formCategory').value,
+                subject: document.getElementById('formSubject').value,
+                title: document.getElementById('formTitle').value,
+                background: document.getElementById('formBackground').value,
+                details: document.getElementById('formDetails').value,
+                insights: document.getElementById('formInsights').value,
+                tags: tags
+            };
+            
+            if (id) {
+                const index = data.findIndex(item => item.id === parseInt(id));
+                if (index !== -1) {
+                    data[index] = newItem;
+                }
+            } else {
+                data.unshift(newItem);
+            }
+            
+            saveData();
+            renderTabs();
+            renderCards();
+            closeFormModal();
+        }
+
+        function editItem(id, event) {
+            event.stopPropagation();
+            const item = data.find(item => item.id === id);
+            if (item) {
+                openFormModal(item);
+            }
+        }
+
+        function deleteItem(id, event) {
+            event.stopPropagation();
+            showConfirm("정말로 이 탐구사례를 삭제하시겠습니까?", () => {
+                data = data.filter(item => item.id !== id);
+                saveData();
+                renderTabs();
+                renderCards();
+                showToast("성공적으로 삭제되었습니다.");
+            });
+        }
+
+        function showToast(message, isError = false) {
+            const toast = document.getElementById('toastMessage');
+            toast.innerText = message;
+            toast.className = `fixed top-10 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-lg shadow-xl z-[100] text-white font-bold transition-all duration-300 ${isError ? 'bg-red-500' : 'bg-green-600'} opacity-100 translate-y-0`;
+            toast.classList.remove('hidden');
+            
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-20px]');
+                setTimeout(() => toast.classList.add('hidden'), 300);
+            }, 3000);
+        }
+
+        let confirmActionCallback = null;
+        function showConfirm(message, callback) {
+            document.getElementById('confirm-modal-message').innerText = message;
+            confirmActionCallback = callback;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+            confirmActionCallback = null;
+        }
+        document.getElementById('confirmOkBtn').addEventListener('click', () => {
+            if (confirmActionCallback) confirmActionCallback();
+            closeConfirmModal();
+        });
+
+        // ==========================================
+        // 파일 첨부 기능 (JSON, 엑셀, PDF, 이미지)
+        // ==========================================
+        
+        let processedFileSignatures = JSON.parse(localStorage.getItem('processedFileSignatures_v1') || '[]');
+
+        function getFileSignature(file) {
+            return `${file.name}_${file.size}_${file.lastModified}`;
+        }
+        
+        function openImportModal() {
+            const loading = document.getElementById('importLoadingIndicator');
+            if (loading) loading.classList.add('hidden');
+            document.getElementById('importModal').classList.remove('hidden');
+        }
+        function closeImportModal() {
+            document.getElementById('importModal').classList.add('hidden');
+        }
+
+        function setImportLoading(isLoading, text = "파일을 분석하고 있습니다...") {
+            const loading = document.getElementById('importLoadingIndicator');
+            const loadingText = document.getElementById('importLoadingText');
+            const fileBtn = document.getElementById('importFileBtn');
+            if (!loading) return;
+
+            if (isLoading) {
+                loadingText.innerText = text;
+                loading.classList.remove('hidden');
+                if (fileBtn) fileBtn.disabled = true;
+            } else {
+                loading.classList.add('hidden');
+                if (fileBtn) fileBtn.disabled = false;
+            }
+        }
+
+        async function importFromFile(event) {
+            const fileList = event.target.files;
+            if (!fileList || fileList.length === 0) return;
+
+            const files = Array.from(fileList);
+            setImportLoading(true, `총 ${files.length}개 파일 검사 중...`);
+
+            let allExtractedCases = [];
+            let successFileCount = 0;
+            let failFileCount = 0;
+            let skippedFiles = [];
+            let newlyProcessedSignatures = [];
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                const signature = getFileSignature(file);
+
+                if (processedFileSignatures.includes(signature)) {
+                    skippedFiles.push(file.name);
+                    continue;
+                }
+
+                const progressText = `[${i + 1}/${files.length}] ${file.name} 분석 중...`;
+                setImportLoading(true, progressText);
+
+                try {
+                    const extractedCases = await extractCasesFromFile(file);
+                    if (Array.isArray(extractedCases) && extractedCases.length > 0) {
+                        allExtractedCases = allExtractedCases.concat(extractedCases);
+                        successFileCount++;
+                        newlyProcessedSignatures.push(signature);
+                    }
+                } catch (err) {
+                    console.error(`파일 처리 실패 (${file.name}):`, err);
+                    failFileCount++;
+                }
+            }
+
+            setImportLoading(false);
+            event.target.value = '';
+
+            if (newlyProcessedSignatures.length > 0) {
+                processedFileSignatures = processedFileSignatures.concat(newlyProcessedSignatures);
+                localStorage.setItem('processedFileSignatures_v1', JSON.stringify(processedFileSignatures));
+            }
+
+            if (allExtractedCases.length > 0) {
+                processImportedData(allExtractedCases);
+                
+                if (skippedFiles.length > 0) {
+                    setTimeout(() => {
+                        const skipMsg = skippedFiles.length === 1 
+                            ? `'${skippedFiles[0]}'은(는) 이미 등록했던 파일이어서 건너뛰었습니다.` 
+                            : `이전에 이미 등록한 파일 ${skippedFiles.length}개는 건너뛰었습니다.`;
+                        showToast(skipMsg);
+                    }, 1200);
+                }
+            } else {
+                if (skippedFiles.length > 0) {
+                    const skipMsg = skippedFiles.length === 1
+                        ? `'${skippedFiles[0]}'은(는) 이전에 이미 등록했던 동일한 파일이어서 작업을 건너뛰었습니다.`
+                        : `선택한 ${skippedFiles.length}개 파일은 모두 이전에 등록된 동일 파일이어서 작업을 건너뛰었습니다.`;
+                    showToast(skipMsg);
+                } else if (failFileCount > 0) {
+                    showToast(`${failFileCount}개 파일 처리에 실패했습니다. 파일 형식을 확인해주세요.`, true);
+                } else {
+                    showToast("추출할 수 있는 유효한 탐구사례를 찾지 못했습니다.", true);
+                }
+            }
+        }
+
+        async function extractCasesFromFile(file) {
+            const fileName = file.name.toLowerCase();
+            const fileExt = fileName.split('.').pop();
+            const isImage = file.type.startsWith('image/');
+
+            if (fileExt === 'json') {
+                const text = await file.text();
+                const importedData = JSON.parse(text);
+                return Array.isArray(importedData) ? importedData : [];
+            }
+
+            if (['xlsx', 'xls', 'csv'].includes(fileExt)) {
+                const arrayBuffer = await file.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                const firstSheetName = workbook.SheetNames[0];
+                const worksheet = workbook.Sheets[firstSheetName];
+                const rawJson = XLSX.utils.sheet_to_json(worksheet);
+
+                let mappedCases = [];
+                if (Array.isArray(rawJson) && rawJson.length > 0) {
+                    const firstRow = rawJson[0];
+                    const keys = Object.keys(firstRow);
+                    const titleKey = keys.find(k => /주제|제목|title|활동명/i.test(k));
+
+                    if (titleKey) {
+                        const catKey = keys.find(k => /계열|분야|category/i.test(k));
+                        const subKey = keys.find(k => /과목|학과|subject/i.test(k));
+                        const bgKey = keys.find(k => /동기|배경|background/i.test(k));
+                        const detKey = keys.find(k => /내용|과정|활동|details/i.test(k));
+                        const insKey = keys.find(k => /느낀점|세특|소감|insight/i.test(k));
+                        const tagKey = keys.find(k => /태그|tag/i.test(k));
+
+                        mappedCases = rawJson.map(row => ({
+                            category: catKey ? row[catKey] : "자연과학",
+                            subject: subKey ? row[subKey] : "",
+                            title: row[titleKey],
+                            background: bgKey ? row[bgKey] : "",
+                            details: detKey ? row[detKey] : "",
+                            insights: insKey ? row[insKey] : "",
+                            tags: tagKey ? (String(row[tagKey]).split(',')) : []
+                        })).filter(c => c.title);
+                    }
+                }
+
+                if (mappedCases.length > 0) {
+                    return mappedCases;
+                } else {
+                    const csvText = XLSX.utils.sheet_to_csv(worksheet);
+                    return await parseTextWithAi(csvText);
+                }
+            }
+
+            if (fileExt === 'pdf') {
+                pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                let fullText = "";
+                const maxPages = Math.min(pdf.numPages, 10);
+                
+                for (let i = 1; i <= maxPages; i++) {
+                    const page = await pdf.getPage(i);
+                    const textContent = await page.getTextContent();
+                    fullText += textContent.items.map(item => item.str).join(' ') + "\n";
+                }
+
+                if (!fullText.trim()) {
+                    throw new Error("PDF 텍스트를 추출할 수 없습니다.");
+                }
+
+                return await parseTextWithAi(fullText);
+            }
+
+            if (isImage) {
+                const base64Data = await fileToBase64(file);
+                return await parseImageWithAi(base64Data, file.type);
+            }
+
+            throw new Error("지원하지 않는 파일 형식");
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => {
+                    const result = reader.result;
+                    const base64 = result.split(',')[1];
+                    resolve(base64);
+                };
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        function repairAndParseJson(rawText) {
+            if (!rawText || typeof rawText !== 'string') return [];
+
+            let clean = rawText.replace(/```json/gi, '').replace(/```/gi, '').trim();
+
+            const startIdx = clean.indexOf('[');
+            const endIdx = clean.lastIndexOf(']');
+            if (startIdx !== -1 && endIdx !== -1 && endIdx > startIdx) {
+                clean = clean.substring(startIdx, endIdx + 1);
+            }
+
+            try {
+                const parsed = JSON.parse(clean);
+                if (Array.isArray(parsed)) return parsed;
+            } catch (e) {}
+
+            let repaired = clean;
+            repaired = repaired.replace(/(?<=[\s,\[])#([^\s",\]]+)"/g, '"#$1"');
+            repaired = repaired.replace(/(?<=[\s,\[])#([^\s",\]]+)(?=[\s,\]])/g, '"#$1"');
+            repaired = repaired.replace(/,\s*([\]}])/g, '$1');
+
+            try {
+                const parsed = JSON.parse(repaired);
+                if (Array.isArray(parsed)) return parsed;
+            } catch (e2) {}
+
+            const results = [];
+            const objectRegex = /\{[\s\S]*?\}(?=\s*,\s*\{|\s*\])/g;
+            const matches = clean.match(objectRegex) || [];
+
+            for (const itemStr of matches) {
+                try {
+                    let fixedItem = itemStr
+                        .replace(/(?<=[\s,\[])#([^\s",\]]+)"/g, '"#$1"')
+                        .replace(/(?<=[\s,\[])#([^\s",\]]+)(?=[\s,\]])/g, '"#$1"')
+                        .replace(/,\s*\}/g, '}');
+                    const obj = JSON.parse(fixedItem);
+                    if (obj.title) results.push(obj);
+                } catch (err) {}
+            }
+
+            if (results.length > 0) return results;
+
+            throw new Error("AI가 생성한 데이터를 JSON 형식으로 변환할 수 없습니다.");
+        }
+
+        async function parseTextWithAi(rawText) {
+            const systemPrompt = `당신은 대한민국 고등학교 학생부/세특 전문 데이터 추출가입니다.
+입력된 문서 내용에서 학생들의 탐구 활동 사례들을 찾아 아래의 JSON 배열 규격으로 추출해주세요.
+개인정보(학생 이름, 주민번호, 학교명 등)는 절대 포함하지 마세요.
+
+반드시 지켜야 할 사항:
+1. 카테고리(category)는 반드시 다음 중 하나여야 합니다: ["인문·어문", "사회과학·경영", "자연과학", "공학", "의약·바이오", "교육", "예체능"]
+2. 태그 배열(tags)의 모든 요소는 반드시 큰따옴표(")로 감싼 문자열이어야 합니다. 예: ["#국제통상", "#보호무역"]
+3. 출력은 반드시 순수한 JSON 배열만 반환하세요:
+[
+  {
+    "category": "계열명",
+    "subject": "관련 과목 / 추천 학과",
+    "title": "탐구 주제 제목",
+    "background": "동기 및 배경",
+    "details": "구체적인 탐구 내용 및 순서",
+    "insights": "느낀 점 및 세특 포인트",
+    "tags": ["#태그1", "#태그2"]
+  }
+]`;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: `다음 문서에서 탐구 사례를 추출해줘 (최대 5건):\n\n${rawText.substring(0, 4500)}` }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json"
+                    }
+                })
+            });
+
+            if (!response.ok) throw new Error("AI 분석 서버 응답 오류");
+            const resData = await response.json();
+            const textResponse = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!textResponse) throw new Error("탐구 사례를 추출하지 못했습니다.");
+
+            return repairAndParseJson(textResponse);
+        }
+
+        async function parseImageWithAi(base64Image, mimeType) {
+            const systemPrompt = `당신은 대한민국 고등학교 학생부/세특 전문 데이터 추출가입니다.
+제공된 이미지(학생부 캡처본, 활동지, 보고서 사진 등)를 읽고, 탐구 활동 사례를 분석하여 JSON 배열 형태로 추출해주세요.
+학생의 이름 등 개인정보는 절대로 포함하지 마세요.
+
+규격:
+1. category는 반드시 ["인문·어문", "사회과학·경영", "자연과학", "공학", "의약·바이오", "교육", "예체능"] 중 하나여야 합니다.
+2. tags의 모든 항목은 반드시 따옴표로 감싼 유효한 문자열이어야 합니다.
+3. 순수 JSON 배열만 반환하세요:
+[
+  {
+    "category": "계열명",
+    "subject": "관련 과목 / 추천 학과",
+    "title": "탐구 주제 제목",
+    "background": "동기 및 배경",
+    "details": "활동 내용",
+    "insights": "느낀 점 및 세특 포인트",
+    "tags": ["#태그1", "#태그2"]
+  }
+]`;
+
+            const apiKey = "";
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+            const response = await fetch(apiUrl, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{
+                        parts: [
+                            { inlineData: { mimeType: mimeType, data: base64Image } },
+                            { text: "이 이미지에 기록된 탐구 활동을 분석하여 규격에 맞는 탐구 사례 JSON 배열로 생성해주세요." }
+                        ]
+                    }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json"
+                    }
+                })
+            });
+
+            if (!response.ok) throw new Error("AI 이미지 분석 서버 응답 오류");
+            const resData = await response.json();
+            const textResponse = resData.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (!textResponse) throw new Error("이미지에서 탐구 사례를 인식하지 못했습니다.");
+
+            return repairAndParseJson(textResponse);
+        }
+
+        function processImportedData(importedData) {
+            if (!Array.isArray(importedData)) {
+                showToast("올바른 형태의 데이터가 아닙니다. JSON 배열 형식이어야 합니다.", true);
+                return;
+            }
+
+            let addedCount = 0;
+            importedData.forEach(item => {
+                if (item.category && item.title) {
+                    let parsedTags = [];
+                    if (Array.isArray(item.tags)) {
+                        parsedTags = item.tags;
+                    } else if (typeof item.tags === 'string') {
+                        parsedTags = item.tags.split(',').map(t => t.trim()).filter(t => t !== "");
+                    }
+                    parsedTags = parsedTags.map(tag => tag.startsWith('#') ? tag : '#' + tag);
+
+                    const newItem = {
+                        id: Date.now() + Math.floor(Math.random() * 10000),
+                        category: item.category,
+                        subject: item.subject || "",
+                        title: item.title,
+                        background: item.background || "",
+                        details: item.details || "",
+                        insights: item.insights || "",
+                        tags: parsedTags
+                    };
+                    
+                    data.unshift(newItem);
+                    addedCount++;
+                }
+            });
+
+            if (addedCount > 0) {
+                saveData();
+                renderTabs();
+                renderCards(); 
+                showToast(`총 ${addedCount}건의 탐구사례가 성공적으로 추가되었습니다!`);
+                closeImportModal();
+            } else {
+                showToast("추가할 수 있는 유효한 데이터가 없습니다. 필수 항목(category, title)을 확인해주세요.", true);
+            }
+        }
+
+        // 전체 데이터를 깃허브 배포용 'data.json' 이름으로 즉시 다운로드하는 함수
+        function exportDataBackup() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data, null, 2));
+            const downloadAnchor = document.createElement('a');
+            downloadAnchor.setAttribute("href", dataStr);
+            // 깃허브에 그대로 올릴 수 있도록 파일명을 정확히 'data.json'으로 지정
+            downloadAnchor.setAttribute("download", `data.json`);
+            document.body.appendChild(downloadAnchor);
+            downloadAnchor.click();
+            downloadAnchor.remove();
+            showToast("깃허브 배포용 'data.json' 파일이 다운로드되었습니다. 깃허브에 드래그하여 올려주세요!");
+        }
+
+        // ==========================================
+        // AI 심화 탐구 주제 추천 기능
+        // ==========================================
+        
+        window.searchFromAi = function(keyword) {
+            const cleanKeyword = keyword.replace(/\[|\]/g, '').trim();
+            closeAiModal();
+            closeModal();
+            currentCategory = "전체보기";
+            renderTabs();
+            const searchInput = document.getElementById('searchInput');
+            searchInput.value = cleanKeyword;
+            currentKeyword = cleanKeyword.toLowerCase();
+            renderCards();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        let aiExtractedText = "";
+
+        function openAiModal() {
+            const aiInput = document.getElementById('aiInput');
+            if (aiInput) aiInput.value = '';
+
+            const aiFileInput = document.getElementById('aiFileInput');
+            if (aiFileInput) aiFileInput.value = '';
+
+            const aiFileName = document.getElementById('aiFileName');
+            if (aiFileName) aiFileName.innerText = '선택된 파일 없음';
+
+            aiExtractedText = "";
+            const aiResultContainer = document.getElementById('aiResultContainer');
+            if (aiResultContainer) aiResultContainer.classList.add('hidden');
+
+            const aiResultContent = document.getElementById('aiResultContent');
+            if (aiResultContent) aiResultContent.innerHTML = '';
+
+            const aiModal = document.getElementById('aiModal');
+            if (aiModal) aiModal.classList.remove('hidden');
+
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeAiModal() {
+            document.getElementById('aiModal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        async function handleAiFileChange(event) {
+            const file = event.target.files[0];
+            const fileNameDisplay = document.getElementById('aiFileName');
+            
+            if (!file) {
+                fileNameDisplay.innerText = '선택된 파일 없음';
+                aiExtractedText = "";
+                return;
+            }
+
+            fileNameDisplay.innerText = `${file.name} (읽는 중...)`;
+            const fileExt = file.name.split('.').pop().toLowerCase();
+            
+            try {
+                if (fileExt === 'pdf') {
+                    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+                    const arrayBuffer = await file.arrayBuffer();
+                    const pdf = await pdfjsLib.getDocument(arrayBuffer).promise;
+                    let fullText = "";
+                    const maxPages = Math.min(pdf.numPages, 10);
+                    for (let i = 1; i <= maxPages; i++) {
+                        const page = await pdf.getPage(i);
+                        const textContent = await page.getTextContent();
+                        const pageText = textContent.items.map(item => item.str).join(' ');
+                        fullText += pageText + "\n";
+                    }
+                    aiExtractedText = fullText;
+                    fileNameDisplay.innerText = `${file.name} (PDF 인식 완료)`;
+                } else if (['xlsx', 'xls', 'csv'].includes(fileExt)) {
+                    const arrayBuffer = await file.arrayBuffer();
+                    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const csvText = XLSX.utils.sheet_to_csv(worksheet);
+                    aiExtractedText = csvText;
+                    fileNameDisplay.innerText = `${file.name} (Excel/CSV 인식 완료)`;
+                } else {
+                    fileNameDisplay.innerText = '지원하지 않는 파일 형식입니다.';
+                    aiExtractedText = "";
+                }
+            } catch (error) {
+                console.error("파일 읽기 에러:", error);
+                fileNameDisplay.innerText = '파일을 읽는 중 오류가 발생했습니다.';
+                aiExtractedText = "";
+            }
+        }
+
+        async function getAiRecommendation(event) {
+            event.preventDefault();
+            const inputElement = document.getElementById('aiInput');
+            const submitBtn = document.getElementById('aiSubmitBtn');
+            const loadingIndicator = document.getElementById('aiLoading');
+            const resultContainer = document.getElementById('aiResultContainer');
+            const resultContent = document.getElementById('aiResultContent');
+            
+            const userQuery = inputElement.value.trim();
+            if (!userQuery && !aiExtractedText) return;
+
+            submitBtn.disabled = true;
+            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            loadingIndicator.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            
+            const systemPrompt = `당신은 대한민국 최고의 고등학교 진로/진학 전문 교사입니다. 
+학생이 자신이 수행한 탐구활동 주제나 내용을 입력하면, 이를 바탕으로 '2022 개정 교육과정' 과목과 연계된 3가지 심화 탐구 주제를 추천해주세요.
+각 추천에는 다음 내용이 포함되어야 합니다:
+1. 연계 과목명 (2022 개정 교육과정 기준, 예: 통합과학, 화법과 언어, 인공지능 기초 등)
+2. 매력적이고 구체적인 탐구 주제
+3. 해당 주제를 탐구하기 위한 간단한 탐구 방법 및 순서 (3~4단계로 제시)
+
+답변은 마크다운 기호(\`\`\`html 등)를 절대 포함하지 말고, 순수 HTML 구조만 출력하세요. 
+Tailwind CSS 환경에서 가독성이 좋도록 다음 태그와 클래스를 반드시 적용하여 예쁘게 꾸며주세요:
+- 추천 목록 컨테이너: <ul class="list-none space-y-5 mb-4">
+- 각 주제 아이템: <li class="bg-white p-5 rounded-xl shadow-sm border border-gray-200">
+- 과목명 (버튼 형태, 온클릭 이벤트 필수): <button onclick="searchFromAi(this.innerText)" class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-indigo-100 text-indigo-800 hover:bg-indigo-200 transition-colors mb-3 cursor-pointer">과목명</button>
+- 개별 주제 제목: <strong class="block text-lg text-gray-900 mb-3 border-b pb-2">주제명</strong>
+- 탐구 순서 컨테이너: <div class="bg-gray-50 p-4 rounded-lg mt-2">
+- 탐구 순서 제목: <span class="font-bold text-sm text-indigo-700 block mb-2">💡 탐구 방법 및 순서</span>
+- 탐구 순서 리스트(ol): <ol class="list-decimal list-inside text-sm text-gray-700 space-y-1">
+- 탐구 순서 항목(li): <li>내용</li>`;
+
+            let finalQuery = userQuery;
+            if (aiExtractedText) {
+                finalQuery += `\n\n[첨부된 참고 문서 내용 요약]\n${aiExtractedText.substring(0, 4000)}`; 
+            }
+
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{ parts: [{ text: finalQuery }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            const fetchWithRetry = async (url, options, retries = 3, delay = 1000) => {
+                for (let i = 0; i < retries; i++) {
+                    try {
+                        const response = await fetch(url, options);
+                        if (!response.ok && response.status === 429) {
+                            await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+                            continue;
+                        }
+                        return response;
+                    } catch (err) {
+                        if (i === retries - 1) throw err;
+                        await new Promise(res => setTimeout(res, delay * Math.pow(2, i)));
+                    }
+                }
+                throw new Error("API Request Failed");
+            };
+
+            try {
+                const response = await fetchWithRetry(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                
+                const result = await response.json();
+                
+                if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts[0].text) {
+                    let aiText = result.candidates[0].content.parts[0].text;
+                    aiText = aiText.replace(/```html\n?/g, '').replace(/```\n?/g, '');
+                    resultContent.innerHTML = aiText;
+                    resultContainer.classList.remove('hidden');
+                } else {
+                    resultContent.innerHTML = '<p class="text-red-500 font-bold p-4 bg-red-50 rounded-lg">추천 결과를 불러오지 못했습니다. 다시 시도해주세요.</p>';
+                    resultContainer.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("AI 추천 오류:", error);
+                resultContent.innerHTML = '<p class="text-red-500 font-bold p-4 bg-red-50 rounded-lg">네트워크 오류 또는 트래픽 제한이 발생했습니다. 잠시 후 다시 시도해주세요.</p>';
+                resultContainer.classList.remove('hidden');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+
+        window.onload = init;
+    </script>
+</body>
+</html>
